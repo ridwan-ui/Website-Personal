@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Surprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffe6f0 0%, #ffffff 50%, #ffe6f0 100%);
+            color: #d32f2f;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            font-family: 'Dancing Script', cursive;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Floating Hearts Animation */
+        .floating-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            color: #e91e63;
+            animation: float 6s linear infinite;
+        }
+        .heart:nth-child(odd) { animation-delay: -2s; }
+        .heart:nth-child(even) { animation-delay: -4s; }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+        /* Glowing Lights */
+        .glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transition: box-shadow 0.3s ease;
+        }
+        .glow:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+        /* Buttons */
+        .btn {
+            background: linear-gradient(45deg, #e91e63, #f48fb1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-weight: 500;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+        }
+        /* Sections */
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+        .hero {
+            background: linear-gradient(135deg, #fce4ec 0%, #ffffff 100%);
+        }
+        .date-section, .message-section, .reveal-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        /* Date Picker */
+        #date-picker {
+            padding: 10px;
+            border: 2px solid #f48fb1;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        /* Message Styles */
+        .message-preview {
+            background: #fce4ec;
+            border: 1px solid #e91e63;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-style: italic;
+            color: #d32f2f;
+        }
+        .style-options {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .style-btn {
+            padding: 8px 16px;
+            border: 1px solid #f48fb1;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .style-btn.active {
+            background: #e91e63;
+            color: white;
+        }
+        /* Countdown */
+        .countdown {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #d32f2f;
+        }
+        /* Music Toggle */
+        .music-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            section { padding: 20px 10px; }
+            .style-options { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="hearts"></div>
+    <div class="countdown" id="countdown"></div>
+    <div class="music-toggle" id="music-toggle">🎵</div>
+    <audio id="bg-music" loop>
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.wav" type="audio/wav"> <!-- Placeholder; replace with romantic instrumental -->
+    </audio>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <h1>Will You Be My Valentine?</h1>
+            <p>Choose our special date and send your love.</p>
+            <button class="btn glow" id="start-btn">Start the Surprise</button>
+        </div>
+    </section>
+
+    <!-- Date Selection Section -->
+    <section class="date-section" id="date-section" style="display: none;">
+        <div class="container">
+            <h2>Select Our Romantic Date</h2>
+            <input type="date" id="date-picker" min="2023-02-14">
+            <button class="btn glow" id="confirm-date">Confirm Date</button>
+            <p id="date-confirmation" style="display: none;"></p>
+        </div>
+    </section>
+
+    <!-- Message Section -->
+    <section class="message-section" id="message-section" style="display: none;">
+        <div class="container">
+            <h2>Write Your Valentine Message</h2>
+            <div class="style-options">
+                <button class="style-btn active" data-style="romantic">Romantic</button>
+                <button class="style-btn" data-style="cute">Cute</button>
+                <button class="style-btn" data-style="funny">Funny</button>
+            </div>
+            <textarea id="message-input" placeholder="Type your message here..." rows="4"></textarea>
+            <div class="message-preview" id="preview"></div>
+            <button class="btn glow" id="download-btn">Download Card</button>
+            <button class="btn glow" id="share-btn">Share Link</button>
+        </div>
+    </section>
+
+    <!-- Reveal Section -->
+    <section class="reveal-section" id="reveal-section" style="display: none;">
+        <div class="container">
+            <h2>Can’t Wait to Celebrate with You ❤️</h2>
+            <p id="final-message"></p>
+        </div>
+    </section>
+
+    <script>
+        // Generate Floating Hearts
+        const heartsContainer = document.getElementById('hearts');
+        for (let i = 0; i < 20; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            heartsContainer.appendChild(heart);
+        }
+
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date();
+            const valentine = new Date(now.getFullYear(), 1, 14); // Feb 14
+            if (now > valentine) valentine.setFullYear(now.getFullYear() + 1);
+            const diff = valentine - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById('countdown').innerText = `${days}d ${hours}h to Valentine's`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Music Toggle
+        const music = document.getElementById('bg-music');
+        document.getElementById('music-toggle').addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+                document.getElementById('music-toggle').innerText = '🔊';
+            } else {
+                music.pause();
+                document.getElementById('music-toggle').innerText = '🎵';
+            }
+        });
+
+        // Navigation
+        document.getElementById('start-btn').addEventListener('click', () => {
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('date-section').style.display = 'flex';
+        });
+
+        // Date Confirmation
+        document.getElementById('confirm-date').addEventListener('click', () => {
+            const date = document.getElementById('date-picker').value;
+            if (date) {
+                document.getElementById('date-confirmation').innerText = `Yay! Our date is set for ${new Date(date).toDateString()} 💕`;
+                document.getElementById('date-confirmation').style.display = 'block';
+                document.getElementById('date-confirmation').classList.add('glow');
+                setTimeout(() => {
+                    document.getElementById('date-section').style.display = 'none';
+                    document.getElementById('message-section').style.display = 'flex';
+                }, 2000);
+            }
+        });
+
+        // Message Preview
+        const input = document.getElementById('message-input');
+        const preview = document.getElementById('preview');
+        const styleBtns = document.querySelectorAll('.style-btn');
+        let currentStyle = 'romantic';
+
+        styleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                styleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentStyle = btn.dataset.style;
+                updatePreview();
+            });
+        });
+
+        input.addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            let styledMessage = input.value;
+            if (currentStyle === 'romantic') styledMessage = `💖 ${styledMessage} 💖`;
+            else if (currentStyle === 'cute') styledMessage = `🥰 ${styledMessage} 🥰`;
+            else if (currentStyle === 'funny') styledMessage = `😂 ${styledMessage} 😂`;
+            preview.innerText = styledMessage || 'Your message will appear here...';
+        }
+
+        // Download/Share
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 300;
+            ctx.fillStyle = '#fce4ec';
+            ctx.fillRect(0, 0, 400, 300);
+            ctx.fillStyle = '#d32f2f';
+            ctx.font = '20px Dancing Script';
+            ctx.fillText('Happy Valentine\'s!', 50, 50);
+            ctx.fillText(preview.innerText, 50, 100);
+            const link = document.createElement('a');
+            link.download = 'valentine-card.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        document.getElementById('share-btn').addEventListener('click', () => {
+            const url = window.location.href + '?message=' + encodeURIComponent(preview.innerText);
+            navigator.share ? navigator.share({ title: 'My Valentine Message', url }) : alert('Share link: ' + url);
+        });
+
+        // Reveal (assuming date and message are confirmed)
+        // In a real app, trigger after both are set; here, simulate after message section
+        setTimeout(() => {
+            document.getElementById('message-section').style.display = 'none';
+            document.getElementById('reveal-section').style.display = 'flex';
+            document.getElementById('final-message').innerText = 'Your surprise is ready! ❤️';
+        }, 5000); // Auto-reveal for demo; adjust logic as needed
+
+        // Smooth Scroll (for navigation if adding links)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
